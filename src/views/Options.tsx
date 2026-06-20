@@ -1,8 +1,8 @@
 import {Box, Button, Stack, Typography} from "@mui/material";
 import GameOption from "../components/GameOption.tsx";
-import React, {useState} from "react";
+import type {Screen} from "../App.tsx";
 
-type GameFlag = "monochrome" | "shortView"
+export type GameFlag = "monochrome" | "shortView"
 
 interface FlagDetails {
     name: string,
@@ -10,14 +10,19 @@ interface FlagDetails {
     mult: number
 }
 
-export default function Options() {
+interface Props {
+    nav: (screen: Screen) => void,
+    flags: Set<GameFlag>
+    onFlagsChange: (flags: Set<GameFlag>) => void,
+}
+
+export default function Options({nav, flags, onFlagsChange}: Readonly<Props>) {
 
     const flagsOpts: FlagDetails[] = [
         {name: "Monochrome", flag: "monochrome", mult: 1.1},
         {name: "Shorter View Time", flag: "shortView", mult: 1.5},
     ]
 
-    const [flags, setFlags] = useState<Set<GameFlag>>(new Set())
     const scoreMultiplier = [...flags].reduce((acc, flag) => acc * (flagsOpts.find(x => x.flag === flag)?.mult ?? 1), 1)
 
     return (
@@ -43,8 +48,8 @@ export default function Options() {
                                 key={opt.flag}
                                 isEnabled={flags.has(opt.flag)}
                                 onSelect={(isEnabled) => isEnabled ?
-                                    setFlags(new Set([...flags, opt.flag]))
-                                    : setFlags(new Set([...flags].filter(x => x !== opt.flag)))}
+                                    onFlagsChange(new Set([...flags, opt.flag]))
+                                    : onFlagsChange(new Set([...flags].filter(x => x !== opt.flag)))}
                             >
                                 {`${opt.name} (x${opt.mult})`}
                             </GameOption>
@@ -58,6 +63,10 @@ export default function Options() {
                 <Stack direction="row" spacing={2} sx={{ justifyContent: "center" }}>
                     <Button
                         variant="contained"
+                        onClick={() => {
+                            onFlagsChange(new Set());
+                            nav("main");
+                        }}
                         sx={{
                             bgcolor: (theme) => theme.brand.pink,
                             color: "black",
@@ -71,6 +80,7 @@ export default function Options() {
                     </Button>
                     <Button
                         variant="contained"
+                        onClick={() => nav("game")}
                         sx={{
                             bgcolor: (theme) => theme.brand.purple,
                             width: "96px",

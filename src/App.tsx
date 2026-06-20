@@ -1,8 +1,8 @@
-import {BrowserRouter, Route, Routes} from "react-router-dom";
 import {Box, createTheme, type Theme, ThemeProvider} from "@mui/material";
-import Main from "./Pages/Main.tsx";
-import Options from "./Pages/Options.tsx";
-import Game from "./Pages/Game.tsx";
+import Main from "./views/Main.tsx";
+import Options, {type GameFlag} from "./views/Options.tsx";
+import Game from "./views/Game.tsx";
+import {useState} from "react";
 
 interface FourColoured {
   pink: string;
@@ -23,6 +23,15 @@ declare module '@mui/material/styles' {
   }
 }
 
+export type Screen = "main" | "options" | "game";
+export type Difficulty = "easy" | "medium" | "hard";
+
+export interface GameState {
+    screen: Screen,
+    difficulty: Difficulty,
+    flags: Set<GameFlag>,
+}
+
 function App() {
 
   const theme: Theme = createTheme({
@@ -33,7 +42,7 @@ function App() {
       purple: "#4c3a6e",
     },
     darkened: {
-      pink: "#0A0E28",
+      pink: "#CCA7B4",
       darkpink: "#3E487A",
       lightpurple: "#617493",
       purple: "#CEC5B7",
@@ -53,6 +62,34 @@ function App() {
     },
   });
 
+  const view = (screen: Screen) => {
+      switch (screen) {
+          case "main":
+              return <Main
+                nav={nav}
+                difficulty={gs.difficulty}
+                onDifficultyChange={(difficulty) => setGs({...gs, difficulty: difficulty})}
+              />
+          case "options":
+              return <Options
+                  nav={nav}
+                  flags={gs.flags}
+                  onFlagsChange={(flags) => setGs({...gs, flags: flags})}
+              />
+          case "game":
+              return <Game
+                nav={nav}
+                state={gs}
+              />
+      }
+  }
+
+  const nav = (screen: Screen) => {
+      setGs({...gs, screen: screen})
+  }
+
+  const [gs, setGs] = useState<GameState>({screen: "main", difficulty: "medium", flags: new Set()})
+
   return (
       <ThemeProvider theme={theme}>
         <Box
@@ -63,13 +100,7 @@ function App() {
                   `linear-gradient(to top, ${theme.brand.purple}, ${theme.brand.darkpink})`,
             }}
         >
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" Component={Main} />
-              <Route path="/options" Component={Options} />
-              <Route path="/play" Component={Game} />
-            </Routes>
-          </BrowserRouter>
+            {view(gs.screen)}
         </Box>
       </ThemeProvider>
   )

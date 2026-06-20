@@ -1,9 +1,14 @@
 import {Box, Button, FormControl, InputLabel, MenuItem, Select, Stack, Typography} from "@mui/material";
-import React, {useState} from "react";
 import "@fontsource/playfair-display/700.css"
+import type {Screen, Difficulty} from "../App.tsx";
 
-export default function Main() {
-    const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">("medium");
+interface Props {
+    nav: (screen: Screen) => void,
+    difficulty: Difficulty,
+    onDifficultyChange: (difficulty: Difficulty) => void,
+}
+
+export default function Main({nav, difficulty, onDifficultyChange}: Readonly<Props>) {
 
     return (
         <Box
@@ -22,6 +27,7 @@ export default function Main() {
                 <Stack direction="row" spacing={2} sx={{ justifyContent: "center", }}>
                     <Button
                         variant="contained"
+                        onClick={() => nav("options")}
                         sx={{
                             bgcolor: (theme) => theme.brand.pink,
                             color: "black",
@@ -35,6 +41,7 @@ export default function Main() {
                     </Button>
                     <Button
                         variant="contained"
+                        onClick={() => nav("game")}
                         sx={{
                             bgcolor: (theme) => theme.brand.purple,
                             width: "96px",
@@ -49,7 +56,7 @@ export default function Main() {
                     <InputLabel sx={{ bgcolor: (theme) => theme.brand.darkpink }}>Difficulty</InputLabel>
                     <Select
                         value={difficulty}
-                        onChange={(event) => setDifficulty(event.target.value)}
+                        onChange={(event) => onDifficultyChange(event.target.value)}
                         variant="filled"
                         sx={{
                             bgcolor: (theme) => theme.brand.darkpink,
