@@ -6,6 +6,7 @@ export interface MemoryCard {
     symbol: string;
     isFlipped: boolean;
     isMatched: boolean;
+    isKnown: boolean;
 }
 
 type Props = {
@@ -110,6 +111,7 @@ export const Card: React.FC<Props> = ({
                         fontWeight: 700,
                         boxShadow: dropShadow(),
                         color: "white",
+                        userSelect: "none",
                     }}
                 >
                     {card.isFlipped ? card.symbol : null}

@@ -16,14 +16,18 @@ interface Props {
     onFlagsChange: (flags: Set<GameFlag>) => void,
 }
 
+const flagsOpts: FlagDetails[] = [
+    {name: "Monochrome", flag: "monochrome", mult: 1.1},
+    {name: "Shorter View Time", flag: "shortView", mult: 1.5},
+]
+
+export function calculateMultiplier(flags: Set<GameFlag>) {
+    return [...flags].reduce((acc, flag) => acc * (flagsOpts.find(x => x.flag === flag)?.mult ?? 1), 1)
+}
+
 export default function Options({nav, flags, onFlagsChange}: Readonly<Props>) {
 
-    const flagsOpts: FlagDetails[] = [
-        {name: "Monochrome", flag: "monochrome", mult: 1.1},
-        {name: "Shorter View Time", flag: "shortView", mult: 1.5},
-    ]
-
-    const scoreMultiplier = [...flags].reduce((acc, flag) => acc * (flagsOpts.find(x => x.flag === flag)?.mult ?? 1), 1)
+    const scoreMultiplier = calculateMultiplier(flags);
 
     return (
         <Box sx={{ height: "100%", width: "100%"}}>

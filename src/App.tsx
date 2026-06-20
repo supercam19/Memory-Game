@@ -1,10 +1,12 @@
 import {Box, createTheme, type Theme, ThemeProvider} from "@mui/material";
 import Main from "./views/Main.tsx";
-import Options, {type GameFlag} from "./views/Options.tsx";
+import Options, {calculateMultiplier, type GameFlag} from "./views/Options.tsx";
 import Game from "./views/Game.tsx";
-import {useState} from "react";
+import {useMemo, useState} from "react";
+import ThemeSelector, {getTheme} from "./components/ThemeSelector.tsx";
+import {useAnimatedTheme} from "./hooks/AnimatedTheme.ts";
 
-interface FourColoured {
+export interface FourColoured {
   pink: string;
   darkpink: string;
   lightpurple: string;
@@ -14,12 +16,10 @@ interface FourColoured {
 declare module '@mui/material/styles' {
   interface ThemeOptions {
     brand?: FourColoured,
-    darkened?: FourColoured,
   }
 
   interface Theme {
     brand: FourColoured,
-    darkened: FourColoured,
   }
 }
 
@@ -30,23 +30,18 @@ export interface GameState {
     screen: Screen,
     difficulty: Difficulty,
     flags: Set<GameFlag>,
+    multiplier: number,
 }
 
 function App() {
 
+  const [activeTheme, setActiveTheme] = useState<string>("dusk");
+
+  const targetTheme = useMemo(() => getTheme(activeTheme), [activeTheme]);
+  const animatedTheme = useAnimatedTheme(targetTheme);
+
   const theme: Theme = createTheme({
-    brand: {
-      pink: "#ffd0e0",
-      darkpink: "#c39eba",
-      lightpurple: "#876c94",
-      purple: "#4c3a6e",
-    },
-    darkened: {
-      pink: "#CCA7B4",
-      darkpink: "#3E487A",
-      lightpurple: "#617493",
-      purple: "#CEC5B7",
-    },
+    brand: animatedTheme,
     typography: {
 
     },
@@ -74,7 +69,7 @@ function App() {
               return <Options
                   nav={nav}
                   flags={gs.flags}
-                  onFlagsChange={(flags) => setGs({...gs, flags: flags})}
+                  onFlagsChange={(flags) => setGs({...gs, flags: flags, multiplier: calculateMultiplier(flags)})}
               />
           case "game":
               return <Game
@@ -88,7 +83,7 @@ function App() {
       setGs({...gs, screen: screen})
   }
 
-  const [gs, setGs] = useState<GameState>({screen: "main", difficulty: "medium", flags: new Set()})
+  const [gs, setGs] = useState<GameState>({screen: "main", difficulty: "medium", flags: new Set(), multiplier: 1})
 
   return (
       <ThemeProvider theme={theme}>
@@ -102,6 +97,7 @@ function App() {
         >
             {view(gs.screen)}
         </Box>
+          <ThemeSelector currentTheme={activeTheme} onThemeChange={setActiveTheme}/>
       </ThemeProvider>
   )
 }

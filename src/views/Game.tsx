@@ -1,7 +1,7 @@
-import {Box, Button, Divider, Stack, Typography} from "@mui/material";
+import {Box, Button, Divider, Stack, Typography, Zoom} from "@mui/material";
 import type {GameState} from "../App.tsx";
 import type {Screen} from "../App.tsx";
-import {useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {Card, type MemoryCard} from "../components/Card.tsx";
 
 interface Props {
@@ -31,6 +31,7 @@ function buildDeck(rows: number): MemoryCard[] {
             symbol: entry.symbol,
             isFlipped: false,
             isMatched: false,
+            isKnown: false,
         }));
 }
 
@@ -53,6 +54,26 @@ export default function Game({nav, state}: Readonly<Props>) {
 
     const [cards, setCards] = useState(() => buildDeck(cardDim));
     const [flippedWaiting, setFlippedWaiting] = useState(-1);
+    const [secsElapsed, setSecsElapsed] = useState(0);
+    const [score, setScore] = useState(0);
+    const [highscore, setHighscore] = useState(() => {
+        try {
+            const curr = window.localStorage.getItem("highscore");
+            if (curr) return Number(curr);
+            else return 0;
+        } catch (err) {
+            console.error(err);
+            return 0;
+        }
+    })
+
+    const restart = () => {
+        setCards(() => buildDeck(cardDim));
+        setFlippedWaiting(-1);
+        setSecsElapsed(0);
+        setScore(0);
+        setHighscore(0);
+    }
 
     const cardClicked = (index: number) => {
         if (cards[index].isFlipped || cards[index].isMatched) return;
@@ -61,6 +82,7 @@ export default function Game({nav, state}: Readonly<Props>) {
         if (flippedWaiting >= 0) {
             if (cards[flippedWaiting].symbol === cards[index].symbol) {
                 setTimeout(() => {
+                    setScore(prev => prev + 100);
                     setCards(prev => {
                         const newCards = [...prev];
                         newCards[flippedWaiting].isMatched = true;
@@ -71,8 +93,12 @@ export default function Game({nav, state}: Readonly<Props>) {
             } else {
                 const curr = flippedWaiting;
                 setTimeout(() => {
+                    if (cards[curr].isKnown) setScore(prev => Math.max(prev - 25, 0));
+                    if (cards[index].isKnown) setScore(prev => Math.max(prev - 25, 0));
                     setCards(prev => {
                         const newCards = [...prev];
+                        newCards[curr].isKnown = true;
+                        newCards[index].isKnown = true;
                         newCards[curr].isFlipped = false;
                         newCards[index].isFlipped = false;
                         return newCards;
@@ -85,6 +111,33 @@ export default function Game({nav, state}: Readonly<Props>) {
         }
 
     }
+
+    const allMatched = useMemo(() => cards.findIndex(card => !card.isMatched) === -1, [cards]);
+
+    useEffect(() => {
+        if (allMatched) return;
+        const interval = setInterval(() => {
+            setSecsElapsed((prev) => prev + 1);
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [allMatched])
+
+    useEffect(() => {
+        if (allMatched) {
+            const finalScore = score * state.multiplier * (120 - secsElapsed) / 15;
+            try {
+                const curr = window.localStorage.getItem("highscore");
+                if (finalScore > Number(curr)) {
+                    window.localStorage.setItem("highscore", finalScore.toString());
+                    setHighscore(finalScore);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    }, [allMatched, score])
+
+    const timeMult = () => Math.max((120 - secsElapsed) / 15, 0.5);
 
     return (
         <Stack direction="row"
@@ -154,8 +207,8 @@ export default function Game({nav, state}: Readonly<Props>) {
                             return <div key="empty-middle" />;
                         }
 
-                        const cardIndex = shouldSkipMiddle && gridIndex > middleIndex 
-                            ? gridIndex - 1 
+                        const cardIndex = shouldSkipMiddle && gridIndex > middleIndex
+                            ? gridIndex - 1
                             : gridIndex;
                         const card = cards[cardIndex];
 
@@ -183,15 +236,91 @@ export default function Game({nav, state}: Readonly<Props>) {
                 textAlign: "left",
             }}>
                 <Typography sx={{ fontWeight: 5, fontSize: 24 }}>Score:</Typography>
-                <Typography sx={{ fontWeight: 5, fontSize: 24, textAlign: "right" }}>0</Typography>
+                <Typography sx={{ fontWeight: 5, fontSize: 24, textAlign: "right" }}>{score}</Typography>
                 <Divider sx={{ gridColumn: "1 / -1" }} />
                 <Typography>Score Multiplier:</Typography>
-                <Typography sx={{ textAlign: "right" }}>x1.00</Typography>
+                <Typography sx={{ textAlign: "right" }}>{state.multiplier}</Typography>
                 <Typography>Modifiers Enabled:</Typography>
-                <Typography sx={{ textAlign: "right" }}>No</Typography>
+                <Typography sx={{ textAlign: "right" }}>{state.flags.size ? "Yes" : "No"}</Typography>
                 <Typography>Time Elapsed:</Typography>
-                <Typography sx={{ textAlign: "right" }}>0:00</Typography>
+                <Typography sx={{ textAlign: "right" }}>{(secsElapsed / 60).toFixed(0) + ":" + (secsElapsed % 60).toString().padStart(2, "0")}</Typography>
             </Stack>
+            {allMatched &&
+                <Box
+                    sx={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        pointerEvents: "none",
+                    }}
+                >
+                    <Zoom in={allMatched} style={{ transformOrigin: "center center" }} timeout={600}>
+                        <Box
+                            sx={{
+                                bgcolor: (theme) => theme.brand.pink,
+                                width: "550px",
+                                height: "350px",
+                                pointerEvents: "auto",
+                                boxShadow: "0 0 10px rgba(0, 0, 0, 0.5)",
+                                borderRadius: "5px",
+                            }}
+                        >
+                            <Stack direction="column-reverse" sx={{
+                                alignItems: "stretch",
+                                justifyContent: "space-between",
+                                height: "100%",
+                            }}>
+                                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                                    <Button
+                                        variant="contained"
+                                        onClick={restart}
+                                        sx={{
+                                            bgcolor: (theme) => theme.brand.purple,
+                                            width: "180px",
+                                            fontSize: "20px",
+                                            fontFamily: "Playfair Display",
+                                            margin: "10px",
+                                        }}
+                                    >
+                                        Play Again
+                                    </Button>
+                                </Box>
+                                <Stack direction="column">
+                                    <Typography style={{fontSize: "36px", color: "black"}}>You Win!</Typography>
+                                    <Stack direction="column" sx={{
+                                        margin: "10px",
+                                        display: "grid",
+                                        gridTemplateColumns: "auto auto",
+                                        gap: "4px 12px",
+                                        alignItems: "center",
+                                        marginX: "20%",
+                                        textAlign: "left",
+                                        '& > *': {
+                                            fontSize: "24px",
+                                            color: "black",
+                                        }
+                                    }}>
+                                        <Typography>Score: </Typography>
+                                        <Typography sx={{textAlign: "right"}}>{score}</Typography>
+                                        <Typography>Time Bonus ({secsElapsed}s): </Typography>
+                                        <Typography sx={{textAlign: "right"}}>x{timeMult().toFixed(2)}</Typography>
+                                        <Typography>Bonus Multiplier: </Typography>
+                                        <Typography sx={{textAlign: "right"}}>x{state.multiplier.toFixed(2)}</Typography>
+                                        <Typography>Final Score: </Typography>
+                                        <Typography sx={{textAlign: "right"}}>{(score * state.multiplier * timeMult()).toFixed(0)}</Typography>
+                                        <Typography>Your High Score: </Typography>
+                                        <Typography sx={{textAlign: "right"}}>{highscore.toFixed(0)}</Typography>
+                                    </Stack>
+                                </Stack>
+                            </Stack>
+                        </Box>
+                    </Zoom>
+                </Box>}
         </Stack>
     )
 }
