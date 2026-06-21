@@ -1,4 +1,4 @@
-import {Box, Button, FormControl, InputLabel, MenuItem, Select, Stack, Typography} from "@mui/material";
+import {Box, Button, darken, FormControl, InputLabel, MenuItem, Select, Stack, Typography} from "@mui/material";
 import "@fontsource/playfair-display/700.css"
 import type {Screen, Difficulty} from "../App.tsx";
 
@@ -24,8 +24,8 @@ export default function Main({nav, difficulty, onDifficultyChange}: Readonly<Pro
             }}
         >
             <Stack direction="column" spacing={2} sx={{ alignItems: "center" }}>
-                <Typography sx={{ fontFamily: "Playfair Display", fontSize: "48px", fontWeight: "5"}}>
-                    Card Matching Memory Game
+                <Typography sx={{ fontFamily: "Playfair Display", fontSize: "72px", fontWeight: "5"}}>
+                    Memory Mania
                 </Typography>
                 <Stack direction="row" spacing={2} sx={{ justifyContent: "center", }}>
                     <Button
@@ -44,7 +44,7 @@ export default function Main({nav, difficulty, onDifficultyChange}: Readonly<Pro
                     </Button>
                     <Button
                         variant="contained"
-                        onClick={() => nav("game")}
+                        onClick={() => nav("game1")}
                         sx={{
                             bgcolor: (theme) => theme.brand.purple,
                             width: "96px",
@@ -56,18 +56,39 @@ export default function Main({nav, difficulty, onDifficultyChange}: Readonly<Pro
                     </Button>
                 </Stack>
                 <FormControl sx={{ width: "fit-content", }}>
-                    <InputLabel sx={{ bgcolor: (theme) => theme.brand.darkpink }}>Difficulty</InputLabel>
+                    <InputLabel
+                        sx={{
+                            position: "relative",
+                            top: 40,
+                            left: -14,
+                            '&.Mui-focused': {
+                                color: "black",
+                            },
+                        }}
+                    >Difficulty</InputLabel>
                     <Select
                         value={difficulty}
                         onChange={(event) => onDifficultyChange(event.target.value)}
                         variant="filled"
+                        label="Difficulty"
                         sx={{
                             bgcolor: (theme) => theme.brand.darkpink,
+                            alignContent: "center",
+                        }}
+                        MenuProps={{
+                            slotProps: {
+                                paper: {
+                                    sx: {
+                                        bgcolor: (theme) => theme.brand.darkpink,
+                                    },
+                                },
+                            },
                         }}
                     >
                         <MenuItem value={"easy"}>Easy</MenuItem>
                         <MenuItem value={"medium"}>Medium</MenuItem>
                         <MenuItem value={"hard"}>Hard</MenuItem>
+                        <MenuItem value={"advanced"}>Advanced</MenuItem>
                     </Select>
                 </FormControl>
             </Stack>

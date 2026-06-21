@@ -49,6 +49,9 @@ export default function Game({nav, state}: Readonly<Props>) {
         case "hard":
             cardDim = 5;
             break;
+        case "advanced":
+            cardDim = 6;
+            break;
     }
 
     const viewTime = state.flags.has('shortView') ? 300 : 1000;
@@ -132,7 +135,7 @@ export default function Game({nav, state}: Readonly<Props>) {
                         newCards[index].isHidden = true;
                         return newCards;
                     });
-                }, viewTime)
+                }, viewTime / 1.5)
             }
             setFlippedWaiting(index);
         }
@@ -164,7 +167,7 @@ export default function Game({nav, state}: Readonly<Props>) {
         }
     }, [allMatched, score])
 
-    const timeMult = () => Math.max(Math.min(((15 * cardDim) - secsElapsed) / 15, 3), 0.5);
+    const timeMult = () => Math.max(Math.min(((5 * (cardDim * cardDim)) - secsElapsed) / (4 * cardDim), (cardDim - 2)), 0.5);
 
     return (
         <Stack direction={{ xs: "column", md: "row" }}
@@ -220,12 +223,12 @@ export default function Game({nav, state}: Readonly<Props>) {
                     textAlign: "center",
                     flexShrink: 0,
                 }}>
-                    Card Matching Memory Game
+                    Memory Mania
                 </Typography>
                 <Box
                     sx={{
                         bgcolor: (theme) => theme.brand.purple,
-                        width: { xs: "min(90vw, 75vh)", md: "min(75vh, 100%)" },
+                        width: { xs: "min(90vw, 85vh)", md: "min(85vh, 100%)" },
                         aspectRatio: "1",
                         display: "grid",
                         gridTemplateColumns: `repeat(${cardDim}, 1fr)`,

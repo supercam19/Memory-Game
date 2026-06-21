@@ -24,8 +24,8 @@ declare module '@mui/material/styles' {
   }
 }
 
-export type Screen = "main" | "options" | "game";
-export type Difficulty = "easy" | "medium" | "hard";
+export type Screen = "main" | "options" | "game" | "game1";
+export type Difficulty = "easy" | "medium" | "hard" | "advanced";
 
 export interface GameState {
     screen: Screen,
@@ -86,6 +86,11 @@ function App() {
               return <Game
                 nav={nav}
                 state={gs}
+              />
+          case "game1":
+              return <Game
+                  nav={nav}
+                  state={{...gs, flags: new Set(), multiplier: 1}}
               />
       }
   }
