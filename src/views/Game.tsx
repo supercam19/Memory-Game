@@ -62,6 +62,7 @@ export default function Game({nav, state}: Readonly<Props>) {
     const [score, setScore] = useState(0);
     const [highscore, setHighscore] = useState(() => Number(window.localStorage.getItem("highscore")))
     const [isStarted, setIsStarted] = useState(false);
+    const [prevHs, setPrevHs] = useState(highscore);
 
     const restart = () => {
         setCards(() => buildDeck(cardDim));
@@ -69,6 +70,7 @@ export default function Game({nav, state}: Readonly<Props>) {
         setSecsElapsed(0);
         setScore(0);
         setIsStarted(false);
+        setPrevHs(highscore);
     }
 
     const cardClicked = (index: number) => {
@@ -313,7 +315,7 @@ export default function Game({nav, state}: Readonly<Props>) {
                                 bgcolor: (theme) => theme.brand.pink,
                                 width: { xs: "90vw", sm: "550px" },
                                 maxWidth: "550px",
-                                height: { xs: "auto", sm: "350px" },
+                                height: { xs: "auto", sm: "380px" },
                                 minHeight: { xs: "300px", sm: "350px" },
                                 pointerEvents: "auto",
                                 boxShadow: "0 0 10px rgba(0, 0, 0, 0.5)",
@@ -365,7 +367,12 @@ export default function Game({nav, state}: Readonly<Props>) {
                                         <Typography>Final Score: </Typography>
                                         <Typography sx={{textAlign: "right"}}>{(score * state.multiplier * timeMult()).toFixed(0)}</Typography>
                                         <Typography>Your High Score: </Typography>
-                                        <Typography sx={{textAlign: "right"}}>{highscore.toFixed(0)}</Typography>
+                                        <Typography sx={{textAlign: "right"}}>{prevHs.toFixed(0)}</Typography>
+                                        {score > prevHs && prevHs && (
+                                                <><Typography>Your Improvement: </Typography>
+                                                    <Typography sx={{textAlign: "right"}}>{(score * state.multiplier * timeMult() / prevHs * 100).toFixed(0)}%</Typography>
+                                                </>
+                                        )}
                                     </Stack>
                                 </Stack>
                             </Stack>
