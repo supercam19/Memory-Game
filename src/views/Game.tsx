@@ -32,6 +32,7 @@ function buildDeck(rows: number): MemoryCard[] {
             isFlipped: false,
             isMatched: false,
             isKnown: false,
+            isHidden: false,
         }));
 }
 
@@ -73,6 +74,11 @@ export default function Game({nav, state}: Readonly<Props>) {
         setCards(prev => prev.map((card, i) => i === index ? {...card, isFlipped: true} : card));
 
         if (flippedWaiting >= 0) {
+            setCards(prev => {
+                const newCards = [...prev];
+                newCards[flippedWaiting].isHidden = false;
+                return newCards;
+            });
             if (cards[flippedWaiting].symbol === cards[index].symbol) {
                 setTimeout(() => {
                     setScore(prev => prev + 100);
@@ -84,10 +90,29 @@ export default function Game({nav, state}: Readonly<Props>) {
                     })
                 }, 1000);
             } else {
-                const curr = flippedWaiting;
+                let curr = flippedWaiting;
                 setTimeout(() => {
                     if (cards[curr].isKnown) setScore(prev => Math.max(prev - 25, 0));
                     if (cards[index].isKnown) setScore(prev => Math.max(prev - 25, 0));
+                    if (cards[curr].isKnown && cards[index].isKnown && state.flags.has('failSwap')) {
+                        const fixedPositions = new Set([curr, index]);
+                        const shuffledMovable = cards
+                            .filter((_, i) => !fixedPositions.has(i))
+                            .map((card) => ({ value: card, order: Math.random() }))
+                            .sort((a, b) => a.order - b.order)
+                            .map((entry) => entry.value);
+
+                        let movableIdx = 0;
+                        setCards(cards.map((card, i) => {
+                            if (fixedPositions.has(i)) {
+                                return card;
+                            }
+                            return {
+                                ...shuffledMovable[movableIdx++],
+                                isKnown: false,
+                            };
+                        }));
+                    }
                     setCards(prev => {
                         const newCards = [...prev];
                         newCards[curr].isKnown = true;
@@ -100,6 +125,15 @@ export default function Game({nav, state}: Readonly<Props>) {
             }
             setFlippedWaiting(-1);
         } else {
+            if (state.flags.has('hideSymbol')) {
+                setTimeout(() => {
+                    setCards(prev => {
+                        const newCards = [...prev];
+                        newCards[index].isHidden = true;
+                        return newCards;
+                    });
+                }, viewTime / 3)
+            }
             setFlippedWaiting(index);
         }
 

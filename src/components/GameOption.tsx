@@ -54,7 +54,7 @@ export default function GameOption({ isEnabled, onSelect, name, multiplier, hint
             onClick={() => onSelect(!isEnabled)}
             sx={{
                 backgroundColor: 'transparent',
-                alignItems: "center",
+                alignItems: "flex-start",
                 padding: '16px',
                 borderRadius: '8px',
                 cursor: 'pointer',
@@ -67,7 +67,7 @@ export default function GameOption({ isEnabled, onSelect, name, multiplier, hint
             <CheckboxIndicator isEnabled={isEnabled} />
             <Stack direction="column" sx={{textAlign: "left"}}>
                 <Typography sx={{ fontSize: "20px" }}>{name + ` (x${multiplier})`}</Typography>
-                {hover && <Typography sx={{ fontSize: "14px", color: "white" }}>{hint}</Typography>}
+                <Typography sx={{ fontSize: "14px", color: "white", visibility: hover ? "visible" : "hidden" }}>{hint}</Typography>
             </Stack>
         </Stack>
     )

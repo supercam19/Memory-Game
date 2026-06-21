@@ -2,7 +2,7 @@ import {Box, Button, Stack, Typography} from "@mui/material";
 import GameOption from "../components/GameOption.tsx";
 import type {Screen} from "../App.tsx";
 
-export type GameFlag = "monochrome" | "shortView" | "hideSymbol";
+export type GameFlag = "monochrome" | "shortView" | "hideSymbol" | "failSwap";
 
 interface FlagDetails {
     name: string,
@@ -21,6 +21,7 @@ const flagsOpts: FlagDetails[] = [
     {name: "Monochrome", flag: "monochrome", mult: 1.1, hint: "Makes all symbols monochrome"},
     {name: "Shorter View Time", flag: "shortView", mult: 1.5, hint: "Reduces the time you have to view symbols"},
     {name: "Ghost Symbols", flag: "hideSymbol", mult: 1.5, hint: "Symbols disappear shortly after you view them"},
+    {name: "Perfectionism", flag: "failSwap", mult: 2, hint: "Failing to match two cards shuffles the entire board"}
 ]
 
 export function calculateMultiplier(flags: Set<GameFlag>) {

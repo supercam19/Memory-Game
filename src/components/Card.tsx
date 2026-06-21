@@ -7,6 +7,7 @@ export interface MemoryCard {
     isFlipped: boolean;
     isMatched: boolean;
     isKnown: boolean;
+    isHidden: boolean;
 }
 
 type Props = {
@@ -119,7 +120,7 @@ export const Card: React.FC<Props> = ({
                         filter: grayed ? "grayscale(100%)" : "none",
                     }}
                 >
-                    {card.isFlipped ? card.symbol : null}
+                    {card.isFlipped ? card.isHidden ? "?" : card.symbol : null}
                     {card.isMatched && (
                         <Box
                             sx={{
