@@ -5,6 +5,7 @@ import Game from "./views/Game.tsx";
 import {useEffect, useMemo, useState} from "react";
 import ThemeSelector, {getTheme} from "./components/ThemeSelector.tsx";
 import {useAnimatedTheme} from "./hooks/AnimatedTheme.ts";
+import { AnimatePresence, motion } from "framer-motion";
 
 export interface FourColoured {
   pink: string;
@@ -99,13 +100,29 @@ function App() {
       <ThemeProvider theme={theme}>
         <Box
             sx={{
-              width: '100vw',
-              height: '100vh',
+              minWidth: '100vw',
+              minHeight: '100vh',
               background: (theme) =>
                   `linear-gradient(to top, ${theme.brand.purple}, ${theme.brand.darkpink})`,
             }}
         >
-            {view(gs.screen)}
+            <AnimatePresence mode="popLayout" initial={false}>
+                <motion.div
+                    key={gs.screen}
+                    initial={{ y: "100%" }}
+                    animate={{ y: 0 }}
+                    exit={{ y: "-100%" }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                    style={{
+                        position: "absolute",
+                        inset: 0,
+                        display: "flex",
+                        flexDirection: "column",
+                    }}
+                >
+                    {view(gs.screen)}
+                </motion.div>
+            </AnimatePresence>
         </Box>
           <ThemeSelector currentTheme={activeTheme} onThemeChange={setActiveTheme}/>
       </ThemeProvider>

@@ -132,7 +132,7 @@ export default function Game({nav, state}: Readonly<Props>) {
                         newCards[index].isHidden = true;
                         return newCards;
                     });
-                }, viewTime / 3)
+                }, viewTime)
             }
             setFlippedWaiting(index);
         }
@@ -164,15 +164,16 @@ export default function Game({nav, state}: Readonly<Props>) {
         }
     }, [allMatched, score])
 
-    const timeMult = () => Math.max(Math.min((60 - secsElapsed) / 15, 3), 0.5);
+    const timeMult = () => Math.max(Math.min(((15 * cardDim) - secsElapsed) / 15, 3), 0.5);
 
     return (
-        <Stack direction="row"
+        <Stack direction={{ xs: "column", md: "row" }}
                sx={{
                    width: "100%",
                    height: "100%",
                    position: "relative",
                    alignItems: "center",
+                   overflowY: { xs: "auto", md: "hidden" },
         }}>
             <Box sx={{
                 position: "absolute",
@@ -198,21 +199,25 @@ export default function Game({nav, state}: Readonly<Props>) {
                 spacing={2}
                 sx={{
                     margin: "0 auto",
-                    height: "100%",
-                    maxHeight: "100%",
+                    width: { xs: "100%", md: "auto" },
+                    height: { xs: "auto", md: "100%" },
+                    maxHeight: { xs: "none", md: "100%" },
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
-                    justifyContent: "center",
+                    justifyContent: { xs: "flex-start", md: "center" },
                     minHeight: 0,
+                    flexShrink: 0,
                     py: 2,
+                    px: 2,
                 }}
             >
                 <Typography sx={{
                     fontFamily: "Playfair Display",
-                    fontSize: "48px",
+                    fontSize: { xs: "32px", md: "48px" },
                     fontWeight: "5",
-                    marginY: "20px",
+                    marginY: { xs: "10px", md: "20px" },
+                    textAlign: "center",
                     flexShrink: 0,
                 }}>
                     Card Matching Memory Game
@@ -220,7 +225,7 @@ export default function Game({nav, state}: Readonly<Props>) {
                 <Box
                     sx={{
                         bgcolor: (theme) => theme.brand.purple,
-                        width: "min(75vh, 100%)",
+                        width: { xs: "min(90vw, 75vh)", md: "min(75vh, 100%)" },
                         aspectRatio: "1",
                         display: "grid",
                         gridTemplateColumns: `repeat(${cardDim}, 1fr)`,
@@ -255,19 +260,24 @@ export default function Game({nav, state}: Readonly<Props>) {
                         );
                     })}
                 </Box>
-                <Typography sx={{ fontSize: "20px", flexShrink: 0 }}>Click on cards to reveal their symbol and make matches</Typography>
+                <Typography sx={{ fontSize: "20px", flexShrink: 0, textAlign: "center" }}>Click on cards to reveal their symbol and make matches</Typography>
             </Stack>
             <Stack sx={{
-                position: "absolute",
-                right: 20,
-                top: "50%",
-                transform: "translateY(-50%)",
+                position: { xs: "static", md: "absolute" },
+                right: { md: 20 },
+                top: { md: "50%" },
+                transform: { md: "translateY(-50%)" },
                 paddingRight: "10px",
                 display: "grid",
                 gridTemplateColumns: "auto auto",
                 gap: "4px 12px",
                 alignItems: "center",
                 textAlign: "left",
+                width: "fit-content",
+                mx: { xs: "auto", md: 0 },
+                mt: { xs: 2, md: 0 },
+                mb: { xs: 4, md: 0 },
+                flexShrink: 0,
             }}>
                 <Typography sx={{ fontWeight: 5, fontSize: 24 }}>Score:</Typography>
                 <Typography sx={{ fontWeight: 5, fontSize: 24, textAlign: "right" }}>{score}</Typography>
@@ -297,8 +307,10 @@ export default function Game({nav, state}: Readonly<Props>) {
                         <Box
                             sx={{
                                 bgcolor: (theme) => theme.brand.pink,
-                                width: "550px",
-                                height: "350px",
+                                width: { xs: "90vw", sm: "550px" },
+                                maxWidth: "550px",
+                                height: { xs: "auto", sm: "350px" },
+                                minHeight: { xs: "300px", sm: "350px" },
                                 pointerEvents: "auto",
                                 boxShadow: "0 0 10px rgba(0, 0, 0, 0.5)",
                                 borderRadius: "5px",

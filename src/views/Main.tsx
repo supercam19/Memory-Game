@@ -15,9 +15,12 @@ export default function Main({nav, difficulty, onDifficultyChange}: Readonly<Pro
             sx={{
                 alignItems: "center",
                 justifyContent: "center",
-                width: "100%",
-                height: "100%",
+                width: "100vw",
+                height: "100vh",
                 display: "flex",
+                flexDirection: "column",
+                flex: 1,
+                minHeight: 0,
             }}
         >
             <Stack direction="column" spacing={2} sx={{ alignItems: "center" }}>

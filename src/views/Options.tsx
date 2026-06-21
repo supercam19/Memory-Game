@@ -33,7 +33,14 @@ export default function Options({nav, flags, onFlagsChange}: Readonly<Props>) {
     const scoreMultiplier = calculateMultiplier(flags);
 
     return (
-        <Box sx={{ height: "100%", width: "100%"}}>
+        <Box sx={{
+            width: "100vw",
+            height: "100vh",
+            display: "flex",
+            flexDirection: "column",
+            flex: 1,
+            minHeight: 0,
+        }}>
             <Stack direction="column" sx={{
                 height: "97%",
                 alignItems: "center",
