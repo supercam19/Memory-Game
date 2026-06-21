@@ -12,6 +12,7 @@ export interface MemoryCard {
 type Props = {
     card: MemoryCard;
     onClick: () => void;
+    grayed?: boolean;
     width?: number;
     height?: number;
 };
@@ -19,6 +20,7 @@ type Props = {
 export const Card: React.FC<Props> = ({
       card,
       onClick,
+      grayed,
   }: Readonly<Props>) => {
     const ref = useRef<HTMLDivElement | null>(null);
     const [hover, setHover] = useState(false);
@@ -81,6 +83,7 @@ export const Card: React.FC<Props> = ({
                     height: "100%",
                     position: "relative",
                     transformStyle: "preserve-3d",
+                    containerType: "inline-size",
                     transition: "transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1)",
                     transform,
                 }}
@@ -107,11 +110,13 @@ export const Card: React.FC<Props> = ({
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        fontSize: 96,
+                        fontSize: "60cqw",
                         fontWeight: 700,
                         boxShadow: dropShadow(),
                         color: "white",
                         userSelect: "none",
+                        lineHeight: 1,
+                        filter: grayed ? "grayscale(100%)" : "none",
                     }}
                 >
                     {card.isFlipped ? card.symbol : null}

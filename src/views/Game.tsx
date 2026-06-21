@@ -50,33 +50,26 @@ export default function Game({nav, state}: Readonly<Props>) {
             break;
     }
 
-    const viewTime = 1000;
+    const viewTime = state.flags.has('shortView') ? 300 : 1000;
 
     const [cards, setCards] = useState(() => buildDeck(cardDim));
     const [flippedWaiting, setFlippedWaiting] = useState(-1);
     const [secsElapsed, setSecsElapsed] = useState(0);
     const [score, setScore] = useState(0);
-    const [highscore, setHighscore] = useState(() => {
-        try {
-            const curr = window.localStorage.getItem("highscore");
-            if (curr) return Number(curr);
-            else return 0;
-        } catch (err) {
-            console.error(err);
-            return 0;
-        }
-    })
+    const [highscore, setHighscore] = useState(() => Number(window.localStorage.getItem("highscore")))
+    const [isStarted, setIsStarted] = useState(false);
 
     const restart = () => {
         setCards(() => buildDeck(cardDim));
         setFlippedWaiting(-1);
         setSecsElapsed(0);
         setScore(0);
-        setHighscore(0);
+        setIsStarted(false);
     }
 
     const cardClicked = (index: number) => {
         if (cards[index].isFlipped || cards[index].isMatched) return;
+        setIsStarted(true);
         setCards(prev => prev.map((card, i) => i === index ? {...card, isFlipped: true} : card));
 
         if (flippedWaiting >= 0) {
@@ -115,16 +108,16 @@ export default function Game({nav, state}: Readonly<Props>) {
     const allMatched = useMemo(() => cards.findIndex(card => !card.isMatched) === -1, [cards]);
 
     useEffect(() => {
-        if (allMatched) return;
+        if (allMatched || !isStarted) return;
         const interval = setInterval(() => {
             setSecsElapsed((prev) => prev + 1);
         }, 1000);
         return () => clearInterval(interval);
-    }, [allMatched])
+    }, [allMatched, isStarted])
 
     useEffect(() => {
         if (allMatched) {
-            const finalScore = score * state.multiplier * (120 - secsElapsed) / 15;
+            const finalScore = score * state.multiplier * timeMult();
             try {
                 const curr = window.localStorage.getItem("highscore");
                 if (finalScore > Number(curr)) {
@@ -137,7 +130,7 @@ export default function Game({nav, state}: Readonly<Props>) {
         }
     }, [allMatched, score])
 
-    const timeMult = () => Math.max((120 - secsElapsed) / 15, 0.5);
+    const timeMult = () => Math.max(Math.min((60 - secsElapsed) / 15, 3), 0.5);
 
     return (
         <Stack direction="row"
@@ -171,10 +164,14 @@ export default function Game({nav, state}: Readonly<Props>) {
                 spacing={2}
                 sx={{
                     margin: "0 auto",
-                    display: "grid",
-                    gridTemplateColumns: "max-content",
-                    justifyItems: "stretch",
-                    justifyContent: "flex-start",
+                    height: "100%",
+                    maxHeight: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    minHeight: 0,
+                    py: 2,
                 }}
             >
                 <Typography sx={{
@@ -182,19 +179,21 @@ export default function Game({nav, state}: Readonly<Props>) {
                     fontSize: "48px",
                     fontWeight: "5",
                     marginY: "20px",
+                    flexShrink: 0,
                 }}>
                     Card Matching Memory Game
                 </Typography>
                 <Box
                     sx={{
                         bgcolor: (theme) => theme.brand.purple,
-                        width: "100%",
+                        width: "min(75vh, 100%)",
                         aspectRatio: "1",
                         display: "grid",
                         gridTemplateColumns: `repeat(${cardDim}, 1fr)`,
                         gridTemplateRows: `repeat(${cardDim}, 1fr)`,
                         gap: "10px",
                         padding: "10px",
+                        flexShrink: 1,
                     }}
 
                 >
@@ -217,11 +216,12 @@ export default function Game({nav, state}: Readonly<Props>) {
                                 key={card.id}
                                 card={card}
                                 onClick={() => cardClicked(cardIndex)}
+                                grayed={state.flags.has('monochrome')}
                             />
                         );
                     })}
                 </Box>
-                <Typography sx={{ fontSize: "20px" }}>Click on cards to reveal their symbol and make matches</Typography>
+                <Typography sx={{ fontSize: "20px", flexShrink: 0 }}>Click on cards to reveal their symbol and make matches</Typography>
             </Stack>
             <Stack sx={{
                 position: "absolute",
@@ -239,11 +239,11 @@ export default function Game({nav, state}: Readonly<Props>) {
                 <Typography sx={{ fontWeight: 5, fontSize: 24, textAlign: "right" }}>{score}</Typography>
                 <Divider sx={{ gridColumn: "1 / -1" }} />
                 <Typography>Score Multiplier:</Typography>
-                <Typography sx={{ textAlign: "right" }}>{state.multiplier}</Typography>
+                <Typography sx={{ textAlign: "right" }}>{state.multiplier.toFixed(2)}</Typography>
                 <Typography>Modifiers Enabled:</Typography>
                 <Typography sx={{ textAlign: "right" }}>{state.flags.size ? "Yes" : "No"}</Typography>
                 <Typography>Time Elapsed:</Typography>
-                <Typography sx={{ textAlign: "right" }}>{(secsElapsed / 60).toFixed(0) + ":" + (secsElapsed % 60).toString().padStart(2, "0")}</Typography>
+                <Typography sx={{ textAlign: "right" }}>{(Math.floor(secsElapsed / 60)).toFixed(0) + ":" + (secsElapsed % 60).toString().padStart(2, "0")}</Typography>
             </Stack>
             {allMatched &&
                 <Box

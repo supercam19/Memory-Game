@@ -1,9 +1,12 @@
 import {Box, Stack, Typography} from "@mui/material";
+import {useState} from "react";
 
 interface Props {
     isEnabled: boolean,
     onSelect: (enabled: boolean) => void,
-    children: string,
+    name: string,
+    multiplier: number,
+    hint: string,
 }
 
 interface CheckboxIndicatorProps {
@@ -40,12 +43,14 @@ const CheckboxIndicator = ({ isEnabled, size = 28 }: Readonly<CheckboxIndicatorP
     </Box>
 );
 
-export default function GameOption({ isEnabled, onSelect, children }: Readonly<Props>) {
-
+export default function GameOption({ isEnabled, onSelect, name, multiplier, hint }: Readonly<Props>) {
+    const [hover, setHover] = useState(false);
     return (
         <Stack
             direction="row"
             spacing={2}
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
             onClick={() => onSelect(!isEnabled)}
             sx={{
                 backgroundColor: 'transparent',
@@ -60,7 +65,10 @@ export default function GameOption({ isEnabled, onSelect, children }: Readonly<P
             }}
         >
             <CheckboxIndicator isEnabled={isEnabled} />
-            <Typography sx={{ fontSize: "20px" }}>{children}</Typography>
+            <Stack direction="column" sx={{textAlign: "left"}}>
+                <Typography sx={{ fontSize: "20px" }}>{name + ` (x${multiplier})`}</Typography>
+                {hover && <Typography sx={{ fontSize: "14px", color: "white" }}>{hint}</Typography>}
+            </Stack>
         </Stack>
     )
 }

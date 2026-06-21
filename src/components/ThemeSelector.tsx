@@ -33,6 +33,18 @@ export const THEME_OPTIONS = [
             lightpurple: "#B784B7",
             purple: "#8E7AB5",
     }},
+    { value: "winter", label: "Winter", theme: {
+            pink: "#FFF2E0",
+            darkpink: "#C0C9EE",
+            lightpurple: "#A2AADB",
+            purple: "#898AC4",
+    }},
+    { value: "galaxy", label: "Galaxy", theme: {
+            pink: "#FF70BF",
+            darkpink: "#D552A3",
+            lightpurple: "#831C91",
+            purple: "#462C7D",
+    }},
 ];
 
 export function getTheme(value: string): FourColoured {
@@ -53,7 +65,7 @@ function ThemeSelector({ currentTheme, onThemeChange }: Readonly<Props>) {
 
     const handleThemeSelect = (event: any) => {
         onThemeChange(event.target.value);
-        handleClose();
+        //handleClose();
     };
 
     return (
@@ -108,6 +120,12 @@ function ThemeSelector({ currentTheme, onThemeChange }: Readonly<Props>) {
                             value={option.value}
                             control={<Radio size="small" />}
                             label={option.label}
+                            sx={{
+                                color: "white",
+                                '&.Mui-checked': {
+                                    color: "white",
+                                },
+                            }}
                         />
                     ))}
                 </RadioGroup>

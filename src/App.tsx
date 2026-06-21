@@ -2,7 +2,7 @@ import {Box, createTheme, type Theme, ThemeProvider} from "@mui/material";
 import Main from "./views/Main.tsx";
 import Options, {calculateMultiplier, type GameFlag} from "./views/Options.tsx";
 import Game from "./views/Game.tsx";
-import {useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import ThemeSelector, {getTheme} from "./components/ThemeSelector.tsx";
 import {useAnimatedTheme} from "./hooks/AnimatedTheme.ts";
 
@@ -35,7 +35,9 @@ export interface GameState {
 
 function App() {
 
-  const [activeTheme, setActiveTheme] = useState<string>("dusk");
+    const themePref = localStorage.getItem("theme");
+
+  const [activeTheme, setActiveTheme] = useState<string>(themePref ?? "dusk");
 
   const targetTheme = useMemo(() => getTheme(activeTheme), [activeTheme]);
   const animatedTheme = useAnimatedTheme(targetTheme);
@@ -56,6 +58,14 @@ function App() {
       },
     },
   });
+
+  useEffect(() => {
+      try {
+          localStorage.setItem("theme", activeTheme);
+      } catch (e) {
+          console.error(e);
+      }
+  }, [activeTheme])
 
   const view = (screen: Screen) => {
       switch (screen) {

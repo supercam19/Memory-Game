@@ -2,12 +2,13 @@ import {Box, Button, Stack, Typography} from "@mui/material";
 import GameOption from "../components/GameOption.tsx";
 import type {Screen} from "../App.tsx";
 
-export type GameFlag = "monochrome" | "shortView"
+export type GameFlag = "monochrome" | "shortView" | "hideSymbol";
 
 interface FlagDetails {
     name: string,
     flag: GameFlag,
-    mult: number
+    mult: number,
+    hint: string,
 }
 
 interface Props {
@@ -17,8 +18,9 @@ interface Props {
 }
 
 const flagsOpts: FlagDetails[] = [
-    {name: "Monochrome", flag: "monochrome", mult: 1.1},
-    {name: "Shorter View Time", flag: "shortView", mult: 1.5},
+    {name: "Monochrome", flag: "monochrome", mult: 1.1, hint: "Makes all symbols monochrome"},
+    {name: "Shorter View Time", flag: "shortView", mult: 1.5, hint: "Reduces the time you have to view symbols"},
+    {name: "Ghost Symbols", flag: "hideSymbol", mult: 1.5, hint: "Symbols disappear shortly after you view them"},
 ]
 
 export function calculateMultiplier(flags: Set<GameFlag>) {
@@ -54,9 +56,10 @@ export default function Options({nav, flags, onFlagsChange}: Readonly<Props>) {
                                 onSelect={(isEnabled) => isEnabled ?
                                     onFlagsChange(new Set([...flags, opt.flag]))
                                     : onFlagsChange(new Set([...flags].filter(x => x !== opt.flag)))}
-                            >
-                                {`${opt.name} (x${opt.mult})`}
-                            </GameOption>
+                                name={opt.name}
+                                multiplier={opt.mult}
+                                hint={opt.hint}
+                            />
                         ))}
                     </Stack>
                 </Stack>
