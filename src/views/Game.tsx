@@ -368,7 +368,7 @@ export default function Game({nav, state}: Readonly<Props>) {
                                         <Typography sx={{textAlign: "right"}}>{(score * state.multiplier * timeMult()).toFixed(0)}</Typography>
                                         <Typography>Your High Score: </Typography>
                                         <Typography sx={{textAlign: "right"}}>{prevHs.toFixed(0)}</Typography>
-                                        {score > prevHs && prevHs && (
+                                        {(score * state.multiplier * timeMult()) > prevHs && prevHs !== 0 && (
                                                 <><Typography>Your Improvement: </Typography>
                                                     <Typography sx={{textAlign: "right"}}>{(score * state.multiplier * timeMult() / prevHs * 100).toFixed(0)}%</Typography>
                                                 </>
