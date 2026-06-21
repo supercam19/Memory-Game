@@ -1,4 +1,4 @@
-import {Box, Button, darken, FormControl, InputLabel, MenuItem, Select, Stack, Typography} from "@mui/material";
+import {Box, Button, FormControl, InputLabel, MenuItem, Select, Stack, Typography} from "@mui/material";
 import "@fontsource/playfair-display/700.css"
 import type {Screen, Difficulty} from "../App.tsx";
 

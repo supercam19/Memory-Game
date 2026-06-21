@@ -228,7 +228,7 @@ export default function Game({nav, state}: Readonly<Props>) {
                 <Box
                     sx={{
                         bgcolor: (theme) => theme.brand.purple,
-                        width: { xs: "min(90vw, 85vh)", md: "min(85vh, 100%)" },
+                        width: "min(60vw, 75vh)",
                         aspectRatio: "1",
                         display: "grid",
                         gridTemplateColumns: `repeat(${cardDim}, 1fr)`,
@@ -304,6 +304,7 @@ export default function Game({nav, state}: Readonly<Props>) {
                         alignItems: "center",
                         justifyContent: "center",
                         pointerEvents: "none",
+                        bgcolor: "rgba(0, 0, 0, 0.4)",
                     }}
                 >
                     <Zoom in={allMatched} style={{ transformOrigin: "center center" }} timeout={600}>
@@ -340,7 +341,7 @@ export default function Game({nav, state}: Readonly<Props>) {
                                     </Button>
                                 </Box>
                                 <Stack direction="column">
-                                    <Typography style={{fontSize: "36px", color: "black"}}>You Win!</Typography>
+                                    <Typography style={{fontSize: "36px", color: "black", fontFamily: "Playfair Display"}}>You Win!</Typography>
                                     <Stack direction="column" sx={{
                                         margin: "10px",
                                         display: "grid",
@@ -360,6 +361,7 @@ export default function Game({nav, state}: Readonly<Props>) {
                                         <Typography sx={{textAlign: "right"}}>x{timeMult().toFixed(2)}</Typography>
                                         <Typography>Bonus Multiplier: </Typography>
                                         <Typography sx={{textAlign: "right"}}>x{state.multiplier.toFixed(2)}</Typography>
+                                        <Divider sx={{ gridColumn: "1 / -1" }} />
                                         <Typography>Final Score: </Typography>
                                         <Typography sx={{textAlign: "right"}}>{(score * state.multiplier * timeMult()).toFixed(0)}</Typography>
                                         <Typography>Your High Score: </Typography>
